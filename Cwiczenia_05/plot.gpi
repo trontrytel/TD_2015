@@ -1,0 +1,21 @@
+set encoding utf8
+
+set title   "Sondaże aerologiczne 31.X.2009 12Z"
+set ylabel  "wysokość [km]"
+set cblabel "temperatura potencjalna [K]"
+
+set term svg size 1000,500
+set output 'plot.svg'
+
+set palette maxcolors 14
+set xrange [30:63]
+set xtics rotate by 18 ("62N Torshavn" 62.01, "60N Lerwick"  60.13, "57N Ekofisk"  56.53)
+
+wdth = 25
+
+set view map
+
+splot \
+  'torshavn' using (62.01):($2/1000):9 with lines lw wdth palette t '', \
+  'lerwick'  using (60.13):($2/1000):9 with lines lw wdth palette t '', \
+  'ekofisk'  using (56.53):($2/1000):9 with lines lw wdth palette t '' 
