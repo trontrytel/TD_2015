@@ -1,0 +1,31 @@
+# ustawienia formatu i nazwy pliku wynikowego
+set term svg
+set output 'zad2.6.svg'
+
+# polskie litery, opisy osi, ustawienie siatki
+set encoding utf8 #iso_8859_2
+set xlabel "temperatura [C]"
+set ylabel "wysokość [m]"
+set grid
+
+# definicja profilu temp. wg ISA (w zakresie 0 - 32km, poza zakresem NaN)
+Czero = 273.15
+T0 = Czero + 15                            # temperatura przy pow. Ziemi [K]
+h0 = 0; h1 = 11000; h2 = 20000; h3 = 32000 # wysokości podstaw warstw 0,1,2 [m]
+dTdz0 = -.0065; dTdz2 = .001;              # gradienty temp. w warstwach 0,2 [K m-1]
+
+ISA_T(h) = \
+  h <  h0 ? NaN : \
+  h <= h1 ? T0 + dTdz0 * h : \
+  h <= h2 ? ISA_T(h1) : \
+  h <= h3 ? ISA_T(h2) + dTdz2 * (h - h2): \
+  NaN
+
+# wykreślanie profilu temperatury wg modelu ISA
+set parametric
+set trange [0:32000]
+set yrange [0:32000]
+set title "2013-03-21 00:00 UTC"  # standard iso 8601 dot. formatu zapisu dat
+plot ISA_T(t) - Czero, t with lines lt 3 title "profil temperatury wg ISA", \
+  'grandjunction_2013032100Z' using 3:2 title "sondaż z Grand Junction", \
+  'coralharbour_2013032100Z' using 3:2 title "sondaż z Coral Harbour"
