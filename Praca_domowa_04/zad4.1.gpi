@@ -1,0 +1,21 @@
+# format zapisu
+set term svg
+set output 'plot.svg'
+set encoding utf8 #iso_8859_2
+
+# ustawienia osi
+set xlabel 'Temperatura [K]'
+set ylabel 'Wysokość [m]'
+set x2label 'Współczynnik mieszania [g/kg] '
+set xtics nomirror
+set x2tics
+set yrange [0:12000]
+set xrange [220:310]
+
+# temperatura wirtualna
+Tv(T, r) = T * (1 + .61 * r)
+
+plot \
+'pagopago_2013032500Z' using ($3)+273:2                     title 'Temperatura',\
+'pagopago_2013032500Z' using (Tv(($3)+273, ($6)/1000)):($2) title 'Temperatura wirtualna',\
+'pagopago_2013032500Z' using 6:2 axes x2y1                  title 'Stos. zmieszania'
