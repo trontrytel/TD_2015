@@ -1,0 +1,36 @@
+# rozwiązanie pracy domowej z pierwszych ćwiczeń
+# przeliczanie pomiędzy różnymi miarami zawartości pary wodnej w powietrzu
+
+# stałe fizyczne
+Mv = 18 * 1e-3      # kg/mol
+Md = 28.97 * 1e-3   # kg/mol
+R  = 8.31           # J / mol / K
+Rd = R / Md
+Rv = R / Mv 
+e  = Mv / Md
+
+# ciśnienie cząstkowe
+pv(p, r) = p * r / (r + e)
+
+# masowy stos. zmieszania (wzg. masy całkowitej)
+q(r) = r / (1. + r)
+
+# gęstość
+rho(p, T, r) = p / T / (Rd/r + Rv)
+
+# koncentracja
+k(p, T, r) = p / Mv / T / (Rd/r + Rv)
+
+# stężenie
+c(r) = r / (e + r)
+
+# dane z sondażu
+r = 3.48  * 1e-3   # kg/kg
+T = 4.6   + 273.15 # K
+p = 973.  * 100    # Pa
+
+print "ciśnienie cząstkowe = ", pv(p, r) / 100,      " hPa"
+print "stosunek zmieszania = ", q(r) * 1000,         " g/kg"
+print "gęstość             = ", rho(p, T, r) * 1000, " g/m3"
+print "koncentracja        = ", k(p, T, r),          " 1/m3"
+print "stężenie            = ", c(r) * 1e6,          " ppm"
