@@ -1,0 +1,24 @@
+# format zapisu
+set term svg
+set output 'plot.svg'
+
+# podpisy osi
+set ylabel  "p [hPa]"
+set xlabel  "T [K]"
+
+# stałe fizyczne
+R  = 8.31           # J/mol/K
+cp = 1006.0         # J/kg/K
+Md = 28.97 * 1e-3   # kg/mol
+
+# nowa oś y ...
+y(p)=-p**(R/cp/Md)
+
+# ... i jej etykiety
+set ytics ('100' y(100), '200 ' y(200), '300' y(300), '400' y(400),\
+           '500' y(500), '600'  y(600), '700'y(700),  '800' y(800),\
+           '900' y(900), '1000' y(1000),\
+            '50' y(50), '20' y(20), '10' y(10))
+
+# rysowanie wykresu
+plot 'abidian_2015' u ($3+273.15) : (y($1)) w lines title "temperatura"
