@@ -1,0 +1,43 @@
+set encoding utf8
+set xlabel 'RH [%]'
+set ylabel 'h [m]'
+set term svg
+set output 'plot.svg'
+
+# polynomial fit coefficients from Flatau_et_al_1992
+a1v = 6.115836990e000 ; a1i = 6.098689930e000
+a2v = 0.444606896e000 ; a2i = 0.499320233e000
+a3v = 0.143177157e-01 ; a3i = 0.184672631e-01
+a4v = 0.264224321e-03 ; a4i = 0.402737184e-03
+a5v = 0.299291081e-05 ; a5i = 0.565392987e-05
+a6v = 0.203154182e-07 ; a6i = 0.521693933e-07
+a7v = 0.702620698e-10 ; a7i = 0.307839583e-09
+a8v = 0.379534310e-13 ; a8i = 0.105785160e-11
+a9v = -.321582393e-15 ; a9i = 0.161444444e-14
+
+T0=273.15 ; eps = 0.62214
+
+poly(T, a1, a2, a3, a4, a5, a6, a7, a8, a9) = \
+  a1               + \
+  a2 * (T - T0)    + \
+  a3 * (T - T0)**2 + \
+  a4 * (T - T0)**3 + \
+  a5 * (T - T0)**4 + \
+  a6 * (T - T0)**5 + \
+  a7 * (T - T0)**6 + \
+  a8 * (T - T0)**7 + \
+  a9 * (T - T0)**8   
+
+# saturation pressure over water and ice
+esv(T) = T < T0 - 85 ? NaN :                100 * poly(T, a1v, a2v, a3v, a4v, a5v, a6v, a7v, a8v, a9v)
+esi(T) = T > T0 ? NaN : T < T0 - 90 ? NaN : 100 * poly(T, a1i, a2i, a3i, a4i, a5i, a6i, a7i, a8i, a9i)
+# water vapor pressure
+pv(p, r) = (p * r) / (eps + r)
+# relative humidity over water and ice
+RHv(p, r, T) = 100 * pv(p, r) / esv(T)
+RHi(p, r, T) = 100 * pv(p, r) / esi(T)
+
+plot \
+  'dane' using 5:2                                    title 'przykładowy profil z sondażu' with linespoints,\
+  'dane' using (RHv(100 * $1, $6 / 1000, $3 + T0)): 2 title 'Flatau i in. 1992 - woda'     with linespoints,\
+  'dane' using (RHi(100 * $1, $6 / 1000, $3 + T0)): 2 title 'Flatau i in. 1992 - lód'      with linespoints
