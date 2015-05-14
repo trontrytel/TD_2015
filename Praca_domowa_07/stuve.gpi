@@ -1,0 +1,38 @@
+set encoding iso_8859_2
+set xlabel 'Temperatura [K]'
+set ylabel 'Ciśnienie [hPa]'
+set terminal pdf
+set output 'stuve2.pdf'
+set key above
+
+# stałe
+Rcp      = .286
+epsilon  = .622
+
+# ustawienia wykresu
+yaxis(p) =-p**Rcp
+set xrange [276 : 310]
+set yrange [yaxis(100000) : yaxis(70000)]
+set ytics ( \
+  "1000" yaxis(100000), "950"  yaxis(95000), "900"  yaxis(90000), "850"  yaxis(85000), \
+  "800"  yaxis(80000),  "750"  yaxis(75000), "700"  yaxis(70000) \
+)
+set xtics 3 rotate by -45
+
+# wzory fizyczne
+T_Kelvin(T_Celsius) = T_Celsius + 273.15
+p_Pascal(p_mbar)    = p_mbar * 100
+const_th(T, th)     = - T / th * (100000)**Rcp
+p_s(T)              = 611 * exp(53.5 - 6810. / T - 5.09 * log(T))
+const_rs(T, rs)     = -(p_s(T) + epsilon * p_s(T) / rs)**Rcp
+
+#rysowanie
+plot \
+  'dane.txt' using (T_Kelvin($3)):(yaxis(p_Pascal($1))) w linespoints lw 5 t 'profil temperatury', \
+  const_th(x, 270) lt 2 notit, const_th(x, 280) lt 2 notit, const_th(x, 290) lt 2 notit, \
+  const_th(x, 300) lt 2 notit, const_th(x, 310) lt 2 notit, const_th(x, 320) lt 2 notit, \
+  const_th(x, 330) lt 2 notit, const_th(x, 340) lt 2 notit, \
+  const_rs(x, .001) lt  8 notit, const_rs(x, .002) lt  8 notit, const_rs(x, .004) lt  8 notit, \
+  const_rs(x, .008) lt  8 notit, const_rs(x, .016) lt  8 notit, const_rs(x, .032) lt  8 notit, \
+  const_th(x, 299.6) t 'suche adiabaty' lt 2 lw 5, \
+  const_rs(x, 17.28*.001) t 'linie stałego r_s' lt 8 lw 5
