@@ -1,0 +1,17 @@
+# zad 6.2
+p_v_s(T) = p_0 * exp((l_v_0 + (c_p_w - c_p_v) * T_0) / R_v * (1 / T_0 - 1. / T) \
+  - (c_p_w - c_p_v) / R_v * log(T/T_0))
+
+# zad 1.1
+q_v_s(T, p) = 1. / (1 - 1. / eps * (1 - p / p_v_s(T)))
+
+# zad 6.1
+R(q_v) = (1 - q_v) * R_d + q_v * R_v
+c_p(q_v) = (1 - q_v) * c_p_d + q_v * c_p_v
+
+# zad 6.2
+l_v(T) = l_v_0 + (c_p_v - c_p_w) * (T - T_0)
+
+# zad 9.1
+dTdp(T, p) = (T / (1. * p) * R(q_v_s(T, p)) + l_v(T) * q_v_s(T, p)**2 / eps / p_v_s(T)) \
+  / (c_p(q_v_s(T, p)) + p * (l_v(T) * q_v_s(T, p) / (1. * T))**2 / eps / R_v / p_v_s(T))

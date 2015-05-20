@@ -1,0 +1,16 @@
+load 'zad9_consts.gpi'
+load 'zad9_lib.gpi'
+load 'zad9_tests.gpi'
+
+rs = $0 # [1] zadany w argumencie stosunek zmieszania, np. .001
+
+# całkowanie RK4
+OUTFILE = sprintf('moist_adiabat_rs=%06.6f', rs)
+F(X, Y) = dTdp(Y, X)
+Y      = 220                             # [K] - temperatura początkowa
+X       = p_v_s(Y) * (1 + eps / rs)      # [Pa] - ciśnienie początkowe 
+DX      = 1000                           # [Pa] - krok całkowania 
+X_MAX   = 110000                         # [Pa] - ciśnienie końcowe
+
+set print OUTFILE
+load 'zad9_rk4.gpi'
