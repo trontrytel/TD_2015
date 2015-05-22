@@ -1,0 +1,94 @@
+set term svg enhanced mouse size 900,700 fsize 13
+set output 'plot_pd.svg'
+set title 'Legionowo 20 maja 2015 12Z'
+set key above
+
+# stałe fizyczne
+c_p_d = 1005.     # [J/kg/K] - ciepło właściwe przy stałym p dla pow. suchego (273K)
+c_p_w = 4218.     # [J/kg/K] - ciepło właściwe przy stałym p dla wody (273K)
+c_p_v = 1850.     # [J/kg/K] - ciepło właściwe przy stałym p dla pary wodnej (273K)
+R     = 8.31432   # [J/mol/K] - uniwersalna stała gazowa
+M_d   = 0.02896   # [kg/mol] - masa molowa powietrza suchego
+M_v   = 0.01802   # [kg/mol] - masa molowa wody
+R_d   = R / M_d   # stała gazowa dla powietrza suchego
+R_v   = R / M_v   # stała gazowa dla pary wodnej
+eps   = M_v / M_d
+p_0   = 611.73    # [Pa] - ciśnienie punktu potrójnego dla wody
+T_0   = 273.16    # [K] - temperatura punktu potrójnego dla wody
+l_v_0 = 2.5e6     # [J/kg] - ciepło utajone parowania wody dla punktu potrójnego
+
+# ciśnienie w stanie nasycenia
+p_v_s(T) = p_0 * exp((l_v_0 + (c_p_w - c_p_v) * T_0) / R_v * (1 / T_0 - 1. / T) - (c_p_w - c_p_v) / R_v * log(T/T_0))
+
+# definicje osi
+xx(T, p) = T + 40 * yy(p)
+yy(p) = - log(p)
+
+# funkcje pomocnicze
+p(p_hPa) = 100 * p_hPa   # hPa -> Pa
+T(T_C) = 273.15 + T_C    #  C  -> k
+xx0(T) = xx(T, 1e5)
+
+# ustawienia kolorów
+pktr = 3; temp = 1; 
+izob = 2; izot = 4; izen = 7; izoh = 6
+
+# ustawienia osi
+set xlabel "T [K]"; set ylabel "p [hPa]"
+p_min = 3e4; p_max = 1e5
+T_min = T(0) - 20; T_max = T(0) + 30
+set xrange [xx0(T_min+10):xx0(T_max)]
+set yrange [yy(p_max):yy(p_min)]
+set ytics ("1000" yy(1e5), "900" yy(9e4), "800" yy(8e4), "700" yy(7e4), "600" yy(6e4), "500" yy(5e4), "400" yy(4e4))
+set xtics ("-30" xx0(T(0)-30), "-25" xx0(T(0)-25), "-20" xx0(T(0)-20), "-15" xx0(T(0)-15), \
+           "-10" xx0(T(0)-10),  "-5" xx0(T(0)-5),    "0" xx0(T(0)),      "5" xx0(T(0)+5), \
+            "10" xx0(T(0)+10),  "15" xx0(T(0)+15),  "20" xx0(T(0)+20),  "25" xx0(T(0)+25), "30" xx0(T(0)+30))
+
+# ustawienia dla wykresów parametrycznych
+set parametric; set trange [0:1]
+tT(t) = (T_min - 30)  + t * (T_max - (T_min - 30))   # parametr w zakresie T_min -30 ... T_max
+tp(t) = p_min + t * (p_max - p_min)                  # parametr w zakresie p_min     ... p_max
+
+# wzory analityczne na p(T, ...) dla th = const i r = const
+izen_p(T, th) = 1e5 * (th / T) ** (-c_p_d / R_d)
+izoh_p(T, r) = p_v_s(T) + eps * p_v_s(T) / r
+
+#  xx(tT(t), izen_p(tT(t), T(0)+ 19)), yy(izen_p(tT(t), T(0)+ 19)) lt izen lw 3 t '', \
+#  xx(tT(t), izoh_p(tT(t), .0094)), yy(izoh_p(tT(t), .0094)) lt izoh lw 3 t '', \
+
+plot \
+  xx0(tT(t)), yy(9e4) lt izob t '', \
+  xx0(tT(t)), yy(8e4) lt izob t '', \
+  xx0(tT(t)), yy(7e4) lt izob t '', \
+  xx0(tT(t)), yy(6e4) lt izob t '', \
+  xx0(tT(t)), yy(5e4) lt izob t '', \
+  xx0(tT(t)), yy(4e4) lt izob t 'izobary', \
+  \
+  xx(T(0)-50, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)-40, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)-30, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)-20, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)-10, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)+00, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)+10, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)+20, tp(t)), yy(tp(t)) lt izot t 'izotermy', \
+  \
+  xx(tT(t), izen_p(tT(t), T(0)- 15)), yy(izen_p(tT(t), T(0)- 15)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)-  5)), yy(izen_p(tT(t), T(0)-  5)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+  5)), yy(izen_p(tT(t), T(0)+  5)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 15)), yy(izen_p(tT(t), T(0)+ 15)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 25)), yy(izen_p(tT(t), T(0)+ 25)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 35)), yy(izen_p(tT(t), T(0)+ 35)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 45)), yy(izen_p(tT(t), T(0)+ 45)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 55)), yy(izen_p(tT(t), T(0)+ 55)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 65)), yy(izen_p(tT(t), T(0)+ 65)) lt izen lw 2 t 'suche adiabaty', \
+  \
+  xx(tT(t), izoh_p(tT(t), .001)), yy(izoh_p(tT(t), .001)) lt izoh lw 2 t '', \
+  xx(tT(t), izoh_p(tT(t), .002)), yy(izoh_p(tT(t), .002)) lt izoh lw 2 t '', \
+  xx(tT(t), izoh_p(tT(t), .004)), yy(izoh_p(tT(t), .004)) lt izoh lw 2 t '', \
+  xx(tT(t), izoh_p(tT(t), .008)), yy(izoh_p(tT(t), .008)) lt izoh lw 2 t '', \
+  xx(tT(t), izoh_p(tT(t), .016)), yy(izoh_p(tT(t), .016)) lt izoh lw 2 t 'izohumidy', \
+  \
+  'dane' u (xx(T($3), p($1))):(yy(p($1))) w lines lt temp lw 3 t 'T', \
+  'dane' u (xx(T($4), p($1))):(yy(p($1))) w lines lt pktr lw 3 t 'T punktu rosy'
+

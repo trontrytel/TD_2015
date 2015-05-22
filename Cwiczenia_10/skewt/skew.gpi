@@ -1,0 +1,100 @@
+set term svg enhanced size 900, 700 fsize 13
+set output 'plot.svg'
+set title 'Jakarta 12Z 18 Jan 2010'
+#set key above
+set key top left
+load 'zad9_consts.gpi'
+load 'zad9_lib.gpi'
+
+# definicje osi
+xx(T, p) = T + 40 * yy(p)
+yy(p) = - log(p)
+
+# funkcje pomocnicze
+xx0(T) = xx(T, 1e5)
+p(p_hPa) = 100 * p_hPa
+T(T_C) = 273.15 + T_C
+
+# ustawienia kolorów
+pktr = 3; temp = 1; 
+izob = 2; izot = 4; izen = 7; izoh = 6; pseu = 9
+
+# ustawienia osi
+set xlabel "T [K]"; set ylabel "p [hPa]"
+p_min = 2e4; p_max = 1e5
+T_min = T(0) + 0; T_max = T(0) + 30
+set xrange [xx0(T_min):xx0(T_max)]
+set yrange [yy(p_max):yy(p_min)]
+set ytics ("1000" yy(1e5), "900" yy(9e4), "800" yy(8e4), "700" yy(7e4), "600" yy(6e4), "500" yy(5e4), "400" yy(4e4))
+set xtics ("-30" xx0(T(0)-30), "-25" xx0(T(0)-25), "-20" xx0(T(0)-20), "-15" xx0(T(0)-15), \
+           "-10" xx0(T(0)-10),  "-5" xx0(T(0)-5),    "0" xx0(T(0)),      "5" xx0(T(0)+5), \
+            "10" xx0(T(0)+10),  "15" xx0(T(0)+15),  "20" xx0(T(0)+20),  "25" xx0(T(0)+25), "30" xx0(T(0)+30))
+
+# ustawienia dla wykresów parametrycznych
+set parametric; set trange [0:1]
+tT(t) = (T_min - 30) + t * (T_max - (T_min - 30))   # parametr w zakresie T_min ... T_max
+tp(t) = p_min + t * (p_max - p_min)                 # parametr w zakresie p_min ... p_max
+
+# wzory analityczne na p(T, ...) dla th = const i r = const
+izen_p(T, th) = 1e5 * (th / T) ** (-c_p_d / R_d)
+izoh_p(T, r) = p_v_s(T) + eps * p_v_s(T) / r
+
+# numeryczne wyznaczanie profili p(T) dla pseudoadiabat
+call 'zad9.gpi' .000060
+call 'zad9.gpi' .000080
+call 'zad9.gpi' .000100
+call 'zad9.gpi' .000120
+call 'zad9.gpi' .000140
+call 'zad9.gpi' .000160
+call 'zad9.gpi' .000145
+call 'zad9.gpi' .000180
+call 'zad9.gpi' .000145
+
+plot \
+  xx0(tT(t)), yy(9e4) lt izob t '', \
+  xx0(tT(t)), yy(8e4) lt izob t '', \
+  xx0(tT(t)), yy(7e4) lt izob t '', \
+  xx0(tT(t)), yy(6e4) lt izob t '', \
+  xx0(tT(t)), yy(5e4) lt izob t '', \
+  xx0(tT(t)), yy(4e4) lt izob t 'izobary', \
+  \
+  xx(T(0)-30, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)-20, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)-10, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)+00, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)+10, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)+20, tp(t)), yy(tp(t)) lt izot t 'izotermy', \
+  xx(T(0)+30, tp(t)), yy(tp(t)) lt izot t '', \
+  xx(T(0)+40, tp(t)), yy(tp(t)) lt izot t '', \
+  \
+  xx(tT(t), izen_p(tT(t), T(0)- 15)), yy(izen_p(tT(t), T(0)- 15)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)-  5)), yy(izen_p(tT(t), T(0)-  5)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+  5)), yy(izen_p(tT(t), T(0)+  5)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 15)), yy(izen_p(tT(t), T(0)+ 15)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 27.4)), yy(izen_p(tT(t), T(0)+ 27.4)) lt izen lw 3 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 25)), yy(izen_p(tT(t), T(0)+ 25)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 35)), yy(izen_p(tT(t), T(0)+ 35)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 45)), yy(izen_p(tT(t), T(0)+ 45)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 55)), yy(izen_p(tT(t), T(0)+ 55)) lt izen lw 2 t '', \
+  xx(tT(t), izen_p(tT(t), T(0)+ 65)), yy(izen_p(tT(t), T(0)+ 65)) lt izen lw 2 t 'suche adiabaty', \
+  \
+  xx(tT(t), izoh_p(tT(t), .001)), yy(izoh_p(tT(t), .001)) lt izoh lw 2 t '', \
+  xx(tT(t), izoh_p(tT(t), .002)), yy(izoh_p(tT(t), .002)) lt izoh lw 2 t '', \
+  xx(tT(t), izoh_p(tT(t), .004)), yy(izoh_p(tT(t), .004)) lt izoh lw 2 t '', \
+  xx(tT(t), izoh_p(tT(t), .008)), yy(izoh_p(tT(t), .008)) lt izoh lw 2 t '', \
+  xx(tT(t), izoh_p(tT(t), .012)), yy(izoh_p(tT(t), .012)) lt izoh lw 2 t '', \
+  xx(tT(t), izoh_p(tT(t), .01828)), yy(izoh_p(tT(t), .01828)) lt izoh lw 3 t '', \
+  xx(tT(t), izoh_p(tT(t), .016)), yy(izoh_p(tT(t), .016)) lt izoh lw 2 t 'izohumidy', \
+  \
+  'moist_adiabat_rs=0.000060' u (xx($2, $1)):(yy($1)) w l lt pseu lw 2 t '', \
+  'moist_adiabat_rs=0.000080' u (xx($2, $1)):(yy($1)) w l lt pseu lw 2 t '', \
+  'moist_adiabat_rs=0.000100' u (xx($2, $1)):(yy($1)) w l lt pseu lw 2 t '', \
+  'moist_adiabat_rs=0.000120' u (xx($2, $1)):(yy($1)) w l lt pseu lw 2 t '', \
+  'moist_adiabat_rs=0.000140' u (xx($2, $1)):(yy($1)) w l lt pseu lw 2 t '', \
+  'moist_adiabat_rs=0.000160' u (xx($2, $1)):(yy($1)) w l lt pseu lw 2 t '', \
+  'moist_adiabat_rs=0.000145' u (xx($2, $1)):(yy($1)) w l lt pseu lw 3 t '', \
+  'moist_adiabat_rs=0.000180' u (xx($2, $1)):(yy($1)) w l lt pseu lw 2 t 'pseudoadiabaty', \
+  \
+  'dane' u (xx(T($3), p($1))):(yy(p($1))) w lines lt temp lw 3 t 'T', \
+  'dane' u (xx(T($4), p($1))):(yy(p($1))) w lines lt pktr lw 3 t 'T punktu rosy'
+
