@@ -1,0 +1,14 @@
+set encoding iso_8859_2
+set xlabel 'wodność właściwa [g/kg]'
+set ylabel 'ciśnienie [hPa]'
+
+call 'zad9.gpi' .0001
+
+# odczytane z pliku moist_adiabat_rs=0.0001
+p_cb = 90720 
+T_cb = 284 
+
+q_v_0    = q_v_s(T_cb, p_cb)
+ql(T, p) = q_v_0 - q_v_s(T, p)
+
+plot [0:5] [p_cb/100:650] 'moist_adiabat_rs=0.000100' using (1000*ql($2,$1)):($1/100) t ''
