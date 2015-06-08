@@ -1,0 +1,13 @@
+R = 8.31432   # [J/mol/K] - uniwersalna staża gazowa
+M_d = 0.02896 # [kg/mol] - masa molowa powietrza suchego
+M_v = 0.01802 # [kg/mol] - masa molowa wody
+R_d = R / M_d # stała gazowa dla powietrza suchego
+R_v = R / M_v # stała gazowa dla pary wodnej
+c_p_d = 1005. # [J/kg/K] - ciepło właściwe przy stałym p dla pow. suchego (273K)
+c_p_v = 1850. # [J/kg/K] - ciepło właściwe przy stałym p dla pary wodnej (273K)
+c_p_w = 4218. # [J/kg/K] - ciepło właściwe przy stałym p dla wody (273K)
+T_0 = 273.16  # [K] - temperatura punktu potrójnego dla wody
+p_0 = 611.73  # [Pa] - ciśnienie punktu potrójnego dla wody
+l_v_0 = 2.5e6 # [J/kg] - ciepło utajone parowania wody dla punktu potrójnego
+eps = M_v / M_d
+g = 9.81      # [m/s^2] - przyspieszenie ziemskie

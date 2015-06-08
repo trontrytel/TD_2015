@@ -1,0 +1,16 @@
+load 'consts.gpi'
+load 'lib.gpi'
+load 'tests.gpi'
+
+rs = $0 # [1] zadany w argumencie stosunek zmieszania, np. .001
+
+# całkowanie RK4
+F(X, Y) = - dTdp(Y, ISA_p(X)) * g * ISA_p(X) / R(q_v_s(Y, ISA_p(X))) / Y
+X       = 0          # [m] - początkowa wysokość
+X_MAX   = 16000      # [m] - końcowa wysokość
+DX      = 10         # [m] - krok całkowania 
+Y       = ISA_T(X)   # [K] - temperatura początkowa
+
+OUTFILE = sprintf('pseudoadiabata')
+set print OUTFILE
+load 'rk4.gpi'
