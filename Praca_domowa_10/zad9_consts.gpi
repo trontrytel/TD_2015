@@ -1,0 +1,12 @@
+R = 8.31432   # [J/mol/K] - uniwersalna sta³a gazowa
+M_d = 0.02896 # [kg/mol] - masa molowa powietrza suchego
+M_v = 0.01802 # [kg/mol] - masa molowa wody
+R_d = R / M_d # sta³a gazowa dla powietrza suchego
+R_v = R / M_v # sta³a gazowa dla pary wodnej
+c_p_d = 1005. # [J/kg/K] - ciep³o w³a¶ciwe przy sta³ym p dla pow. suchego (273K)
+c_p_v = 1850. # [J/kg/K] - ciep³o w³a¶ciwe przy sta³ym p dla pary wodnej (273K)
+c_p_w = 4218. # [J/kg/K] - ciep³o w³a¶ciwe przy sta³ym p dla wody (273K)
+T_0 = 273.16  # [K] - temperatura punktu potrójnego dla wody
+p_0 = 611.73  # [Pa] - ci¶nienie punktu potrójnego dla wody
+l_v_0 = 2.5e6 # [J/kg] - ciep³o utajone parowania wody dla punktu potrójnego
+eps = M_v / M_d
